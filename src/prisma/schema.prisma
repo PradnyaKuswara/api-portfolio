@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid      String   @unique
+  email     String   @unique
+  name      String?
+  password  String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProjectCategory {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid      String   @unique
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects Project[]
+}
+
+model Tag {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid      String   @unique
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts ArticleTag[]
+}
+
+model Certificate {
+  id             BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid           String   @unique
+  name           String   @unique
+  organization   String
+  month_obtained String
+  year_obtained  String
+  month_expired  String
+  year_expired   String
+  url            String
+  description    String   @db.LongText
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Article {
+  id           BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid         String   @unique
+  title        String   @unique
+  thumbnail    String   @db.Text
+  slug         String   @unique
+  content      String   @db.LongText
+  meta_desc    String   @db.Text
+  meta_keyword String?  @db.Text
+  is_active    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tags ArticleTag[]
+}
+
+model Project {
+  id                  BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid                String   @unique
+  project_category_id BigInt   @db.UnsignedBigInt
+  title               String   @unique
+  image               String   @db.Text
+  slug                String   @unique
+  description         String   @db.LongText
+  stack               String   @db.Text
+  link_github         String?  @db.Text
+  link_project        String?  @db.Text
+  link_documentation  String?  @db.Text
+  is_active           Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  ProjectCategory ProjectCategory @relation(fields: [project_category_id], references: [id])
+}
+
+model ArticleTag {
+  article_id BigInt @db.UnsignedBigInt
+  tag_id     BigInt @db.UnsignedBigInt
+
+  createdAt DateTime @default(now())
+
+  Article Article @relation(fields: [article_id], references: [id])
+  Tag     Tag     @relation(fields: [tag_id], references: [id])
+
+  @@id([article_id, tag_id])
+}
