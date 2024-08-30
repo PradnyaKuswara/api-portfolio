@@ -267,6 +267,63 @@ class CertificateController {
       next(error);
     }
   }
+
+  async allFront(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { page, limit, search = '' }: {
+        page?: string;
+        limit?: string;
+        search?: string
+      } = req.query;
+
+      const pageNumber: number | undefined = page ? parseInt(page as string, 10) : undefined;
+      const limitNumber: number | undefined = limit ? parseInt(limit as string, 10) : undefined;
+
+      const [certificates, totalCertificates]: [Certificate[], number] = await prisma.$transaction([
+        prisma.certificate.findMany({
+          where: {
+            name: {
+              contains: search as string, // Filter berdasarkan nama
+            },
+          },
+          skip: pageNumber && limitNumber ? (pageNumber - 1) * limitNumber : undefined,
+          take: limitNumber,
+        }),
+        prisma.certificate.count({
+          where: {
+            name: {
+              contains: search as string,
+            },
+          },
+        }),
+      ]);
+
+      if (certificates.length === 0) {
+        res.status(200).json({
+          message: "Certificates not found",
+          status: 200,
+          data: []
+        });
+        return;
+      }
+
+      const responsecertificates: any = certificates.map((certificate: Certificate) => {
+        return {
+          ...certificate,
+          id: certificate.id.toString()
+        }
+      });
+
+      res.status(200).json({
+        message: "Certificates retrieved",
+        status: 200,
+        data: responsecertificates,
+        total: totalCertificates
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 }
 
 export default CertificateController;

@@ -87,6 +87,8 @@ model Project {
   link_project        String?  @db.Text
   link_documentation  String?  @db.Text
   is_active           Boolean  @default(false)
+  meta_desc           String   @db.Text
+  meta_keyword        String?  @db.Text
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 

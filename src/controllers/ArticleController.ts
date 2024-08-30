@@ -509,7 +509,7 @@ class ArticleController {
           }
         }
       });
-      
+
       res.status(200).json({
         message: "Article update status successfully",
         status: 200
@@ -518,6 +518,126 @@ class ArticleController {
       next(error);
     }
   }
+
+  async allFront(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { page, limit, search = '' }: {
+        page?: string;
+        limit?: string;
+        search?: string
+      } = req.query;
+
+      const pageNumber: number | undefined = page ? parseInt(page as string, 10) : undefined;
+      const limitNumber: number | undefined = limit ? parseInt(limit as string, 10) : undefined;
+
+      const [articles, totalArticles]: [Article[], number] = await prisma.$transaction([
+        prisma.article.findMany({
+          where: {
+            title: {
+              contains: search as string, // Filter berdasarkan nama
+            },
+            is_active: true
+          },
+          skip: pageNumber && limitNumber ? (pageNumber - 1) * limitNumber : undefined,
+          take: limitNumber,
+          include: {
+            tags: {
+              include: {
+                Tag: true
+              }
+            }
+          }
+        }),
+        prisma.article.count({
+          where: {
+            title: {
+              contains: search as string,
+            },
+            is_active: true
+          },
+        }),
+      ]);
+
+
+      if (articles.length === 0) {
+        res.status(200).json({
+          message: "Articles not found",
+          status: 200,
+          data: []
+        });
+        return;
+      }
+
+      const responseArticles: any = articles.map((article: Article) => {
+        return {
+          ...article,
+          id: article.id.toString(),
+          tags: article.tags.map((tag: ArticleTag) => {
+            return {
+              ...tag.Tag,
+              id: tag.Tag.id.toString()
+            }
+          })
+        };
+      });
+
+      res.status(200).json({
+        message: "Articles retrieved successfully",
+        status: 200,
+        data: responseArticles,
+        total: totalArticles
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async showFront(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const slugParam: string = req.params.slug;
+
+    try {
+      const article: Article | null = await prisma.article.findFirst({
+        where: {
+          slug: slugParam,
+          is_active: true
+        },
+        include: {
+          tags: {
+            include: {
+              Tag: true
+            }
+          }
+        }
+      });
+
+      if (!article) {
+        res.status(200).json({
+          message: "Article not found",
+          status: 200,
+          data: null
+        });
+        return;
+      }
+
+      res.status(200).json({
+        message: "Article retrieved successfully",
+        status: 200,
+        data: {
+          ...article,
+          id: article.id.toString(),
+          tags: article.tags.map((tag: ArticleTag) => {
+            return {
+              ...tag.Tag,
+              id: tag.Tag.id.toString()
+            }
+          })
+        }
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
 }
 
 export default ArticleController;

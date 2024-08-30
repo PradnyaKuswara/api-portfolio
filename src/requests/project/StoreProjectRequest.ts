@@ -15,6 +15,11 @@ export const StoreProjectRequest = [
   body("stack").not().isEmpty().withMessage("Stack is required"),
   body("stack").isString().withMessage("Stack must be a string"),
   body("stack").isLength({ min: 2 }).withMessage("Stack must be at least 2 characters long"),
+  body("meta_desc").not().isEmpty().withMessage("Meta description is required"),
+  body("meta_desc").isString().withMessage("Meta description must be a string"),
+  body("meta_desc").isLength({ min: 2 }).withMessage("Meta description must  be at least 2 characters long"),
+  body("meta_keyword").isString().withMessage("Meta keyword must be a string"),
+  body("meta_keyword").isLength({ min: 2 }).withMessage("Meta keyword must  be at least 2 characters long"),
   body("title").custom(async (value) => {
     const project = await prisma.project.findFirst({
       where: {

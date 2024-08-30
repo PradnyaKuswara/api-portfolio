@@ -1,4 +1,4 @@
-import { Router } from "express"; 
+import { Router } from "express";
 import ArticleController from "../controllers/ArticleController";
 import { StoreArticleRequest } from "../requests/article/StoreArticleRequest";
 import { UpdateArticleRequest } from "../requests/article/UpdateArticleRequest";
@@ -14,6 +14,9 @@ router.get("/articles/:slug", accessValidation, controller.show);
 router.post("/articles", upload, compressImage, accessValidation, StoreArticleRequest, controller.store);
 router.patch("/articles/:slug", upload, compressImage, accessValidation, UpdateArticleRequest, controller.update);
 router.delete("/articles/:slug", accessValidation, controller.delete);
-router.patch("/articles/status/:slug",  accessValidation, controller.updateStatus);
+router.patch("/articles/status/:slug", accessValidation, controller.updateStatus);
+
+router.get("/articles-front", controller.allFront);
+router.get("/articles-front/:slug", controller.showFront);
 
 export default router;

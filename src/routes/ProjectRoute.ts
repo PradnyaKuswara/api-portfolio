@@ -16,4 +16,7 @@ router.patch("/projects/:slug", upload, compressImage, UpdateProjectRequest, acc
 router.delete("/projects/:slug", accessValidation, controller.delete);
 router.patch("/projects/status/:slug", accessValidation, controller.updateStatus);
 
+router.get("/projects-front", controller.allFront);
+router.get("/projects-front/:slug", controller.showFront);
+
 export default router;

@@ -13,4 +13,6 @@ router.post("/certificates", StoreCertificateRequest, accessValidation, controll
 router.patch("/certificates/:uuid", UpdateCertificateRequest, accessValidation, controller.update);
 router.delete("/certificates/:uuid", accessValidation, controller.delete);
 
+router.get("/certificates-front", controller.allFront);
+
 export default router;
