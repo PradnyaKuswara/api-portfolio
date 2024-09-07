@@ -46,7 +46,12 @@ const fileFilter = (_req: any, file: any, cb: any) => {
   }
 };
 
-export const upload = multer({ storage: storage, fileFilter: fileFilter }).single('image');
+// Membatasi ukuran file menjadi maksimal 1 MB
+export const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 1 * 1024 * 1024 } // 1 MB
+}).single('image');
 
 export const compressImage = async (req: any, _res: any, next: any) => {
   if (!req.file) {
@@ -54,7 +59,7 @@ export const compressImage = async (req: any, _res: any, next: any) => {
   }
 
   try {
-    const urlPath = req.originalUrl.split('/')[3]; 
+    const urlPath = req.originalUrl.split('/')[3];
     const folder = path.join('public/images', urlPath);
 
     if (!fs.existsSync(folder)) {
@@ -65,7 +70,7 @@ export const compressImage = async (req: any, _res: any, next: any) => {
     const outputPath = path.join(folder, filename);
 
     await sharp(req.file.buffer)
-      .png({ quality: 80 }) 
+      .png({ quality: 80 })
       .jpeg({ quality: 80 })
       .toFile(outputPath);
 
