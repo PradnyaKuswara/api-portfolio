@@ -2,35 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import { validationResult } from "express-validator";
 import { v4 as uuidv4 } from 'uuid';
+import { bodyType, Certificate } from "../@types/Certificate";
 
 const prisma = new PrismaClient();
-
-interface bodyType {
-  uuid: string;
-  name: string;
-  organization: string;
-  month_obtained: string;
-  year_obtained: string;
-  month_expired: string;
-  year_expired: string;
-  url: string;
-  description: string;
-}
-
-type Certificate = {
-  id: bigint,
-  uuid: string,
-  name: string,
-  organization: String,
-  month_obtained: string,
-  year_obtained: string,
-  month_expired: string,
-  year_expired: string,
-  url: string,
-  description: string,
-  createdAt: Date,
-  updatedAt: Date
-}
 
 const generateUUID = (): string => {
   return uuidv4();

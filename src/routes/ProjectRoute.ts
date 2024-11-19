@@ -3,7 +3,7 @@ import ProjectController from "../controllers/ProjectController";
 import { StoreProjectRequest } from "../requests/project/StoreProjectRequest";
 import { upload, compressImage } from "../middleware/fileupload";
 import { UpdateProjectRequest } from "../requests/project/UpdateProjectRequest";
-import { accessValidation } from "../middleware/auth";
+import { accessValidation } from "../middleware/authorization";
 
 const router = Router();
 

@@ -4,52 +4,9 @@ import { validationResult } from "express-validator";
 import { v4 as uuidv4 } from 'uuid';
 import fs from "fs";
 import path from "path";
+import { bodyType, Project } from "../@types/Project";
 
 const prisma = new PrismaClient();
-
-interface bodyType {
-  uuid: string,
-  project_category_id: number,
-  title: string;
-  image: string;
-  slug: string;
-  description: string;
-  stack: string;
-  link_github: string | null;
-  link_project: string | null;
-  link_documentation: string | null;
-  meta_desc: string;
-  meta_keyword: string;
-}
-
-type ProjectCategory = {
-  id: bigint;
-  uuid: string;
-  name: string;
-  createdAt: Date,
-  updatedAt: Date,
-}
-
-type Project = {
-  id: bigint;
-  uuid: string;
-  project_category_id: bigint;
-  title: string;
-  image: string;
-  slug: string;
-  description: string;
-  stack: string,
-  link_github: string | null,
-  link_project: string | null,
-  link_documentation: string | null,
-  is_active: boolean,
-  meta_desc: string,
-  meta_keyword: string | null,
-  createdAt: Date,
-  updatedAt: Date,
-
-  ProjectCategory: ProjectCategory
-}
 
 const generateUUID = (): string => {
   return uuidv4();

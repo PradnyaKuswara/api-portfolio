@@ -2,7 +2,7 @@ import { Router } from "express";
 import TagController from "../controllers/TagController";
 import { StoreTagRequest } from "../requests/tag/StoreTagRequest";
 import { UpdateTagRequest } from "../requests/tag/UpdateTagRequest";
-import { accessValidation } from "../middleware/auth";
+import { accessValidation } from "../middleware/authorization";
 
 const router = Router();
 const controller = new TagController();

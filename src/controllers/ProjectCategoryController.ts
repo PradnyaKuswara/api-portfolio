@@ -2,21 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import { validationResult } from "express-validator";
 import { v4 as uuidv4 } from 'uuid';
+import { bodyType, ProjectCategory } from "../@types/ProjectCategory";
 
 const prisma = new PrismaClient();
-
-interface bodyType {
-  uuid: string;
-  name: string;
-}
-
-type ProjectCategory = {
-  id: bigint;
-  uuid: string;
-  name: string;
-  createdAt: Date,
-  updatedAt: Date,
-}
 
 const generateUUID = (): string => {
   return uuidv4();

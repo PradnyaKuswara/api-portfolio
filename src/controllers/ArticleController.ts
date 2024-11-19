@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { bodyType, Article, ArticleTag, Tag } from "../@types/Article";
 import { PrismaClient } from "@prisma/client";
 import { validationResult } from "express-validator";
 import { v4 as uuidv4 } from 'uuid';
@@ -6,44 +7,6 @@ import fs from "fs";
 import path from "path";
 
 const prisma = new PrismaClient();
-
-interface bodyType {
-  uuid: string,
-  title: string;
-  thumbail: string;
-  slug: string;
-  content: string;
-  meta_desc: string;
-  meta_keyword: string;
-  tags: string;
-}
-
-type Tag = {
-  id: bigint,
-  uuid: string,
-  name: string,
-  createdAt: Date,
-  updatedAt: Date,
-}
-
-type ArticleTag = {
-  Tag: Tag
-}
-
-type Article = {
-  id: bigint,
-  uuid: string,
-  title: string,
-  thumbnail: string,
-  slug: string,
-  content: string,
-  meta_desc: string,
-  meta_keyword: string | null,
-  is_active: boolean,
-  createdAt: Date,
-  updatedAt: Date,
-  tags: ArticleTag[]
-}
 
 const generateUUID = (): string => {
   return uuidv4();

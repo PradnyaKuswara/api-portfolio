@@ -1,13 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-// interface CustomRequest extends Request {
-//   headers: {
-//     authorization: string;
-//   },
-//   userData?: any;
-// }
-
 interface userData {
   uuid: string;
   email: string;

@@ -2,7 +2,7 @@ import { Router } from "express";
 import ProjectCategoryController from "../controllers/ProjectCategoryController";
 import { StoreProjectCategoryRequest } from "../requests/project-category/StoreProjectCategoryRequest";
 import { UpdateProjectCategoryRequest } from "../requests/project-category/UpdateProjectCategoryRequest";
-import { accessValidation } from "../middleware/auth";
+import { accessValidation } from "../middleware/authorization";
 
 const router = Router();
 const controller = new ProjectCategoryController();

@@ -2,7 +2,7 @@ import { Router } from "express";
 import CertificateController from "../controllers/CertificateController";
 import { StoreCertificateRequest } from "../requests/certificate/StoreCertificateRequest";
 import { UpdateCertificateRequest } from "../requests/certificate/UpdateCertificateRequest";
-import { accessValidation } from "../middleware/auth";
+import { accessValidation } from "../middleware/authorization";
 
 const router = Router();
 const controller = new CertificateController();

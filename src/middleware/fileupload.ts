@@ -47,7 +47,9 @@ const fileFilter = (_req: any, file: any, cb: any) => {
 };
 
 // Membatasi ukuran file menjadi maksimal 1 MB
-export const upload = multer({
+import { RequestHandler } from 'express';
+
+export const upload: RequestHandler = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: { fileSize: 1 * 1024 * 1024 } // 1 MB

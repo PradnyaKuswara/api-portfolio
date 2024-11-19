@@ -1,7 +1,7 @@
-import { Router } from "express"; 
+import { Router } from "express";
 import AuthenticatedSessionController from "../controllers/AuthenticatedSessionController";
 import { StoreLoginRequest } from "../requests/login/StoreLoginRequest";
-import { accessValidation } from "../middleware/auth";
+import { accessValidation } from "../middleware/authorization";
 
 const router = Router();
 

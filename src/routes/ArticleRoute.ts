@@ -3,7 +3,7 @@ import ArticleController from "../controllers/ArticleController";
 import { StoreArticleRequest } from "../requests/article/StoreArticleRequest";
 import { UpdateArticleRequest } from "../requests/article/UpdateArticleRequest";
 import { upload, compressImage } from "../middleware/fileupload";
-import { accessValidation } from "../middleware/auth";
+import { accessValidation } from "../middleware/authorization";
 
 const router = Router();
 

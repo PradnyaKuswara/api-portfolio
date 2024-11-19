@@ -2,21 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import { validationResult } from "express-validator";
 import { v4 as uuidv4 } from 'uuid';
+import { Tag, bodyType } from "../@types/Tag";
 
 const prisma = new PrismaClient();
-
-interface bodyType {
-  uuid: string;
-  name: string;
-}
-
-type Tag = {
-  id: bigint;
-  uuid: string;
-  name: string;
-  createdAt: Date,
-  updatedAt: Date,
-}
 
 const generateUUID = (): string => {
   return uuidv4();
@@ -52,7 +40,6 @@ class TagController {
           },
         }),
       ]);
-      // const tags = await prisma.tag.findMany();
 
       if (tags.length === 0) {
         res.status(200).json({
