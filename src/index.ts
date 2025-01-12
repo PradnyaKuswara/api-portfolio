@@ -10,6 +10,8 @@ import NotFound from './middleware/404';
 import HandleError from './middleware/500';
 import path from 'path';
 
+require('dotenv').config();
+
 const app = express();
 
 app.use(cors());

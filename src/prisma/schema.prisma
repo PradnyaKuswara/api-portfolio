@@ -4,17 +4,17 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-
 model User {
-  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  id        BigInt   @id @default(autoincrement()) @db.BigInt
   uuid      String   @unique
   email     String   @unique
   name      String?
@@ -24,27 +24,27 @@ model User {
 }
 
 model ProjectCategory {
-  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  id        BigInt   @id @default(autoincrement()) @db.BigInt
   uuid      String   @unique
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  projects Project[]
+  projects Project[] @relation("CategoryToProjects")
 }
 
 model Tag {
-  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  id        BigInt   @id @default(autoincrement()) @db.BigInt
   uuid      String   @unique
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  posts ArticleTag[]
+  posts ArticleTag[] @relation("TagToArticleTags")
 }
 
 model Certificate {
-  id             BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  id             BigInt   @id @default(autoincrement()) @db.BigInt
   uuid           String   @unique
   name           String   @unique
   organization   String
@@ -53,35 +53,35 @@ model Certificate {
   month_expired  String
   year_expired   String
   url            String
-  description    String   @db.LongText
+  description    String   @db.Text
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
 
 model Article {
-  id           BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  id           BigInt   @id @default(autoincrement()) @db.BigInt
   uuid         String   @unique
   title        String   @unique
   thumbnail    String   @db.Text
   slug         String   @unique
-  content      String   @db.LongText
+  content      String   @db.Text
   meta_desc    String   @db.Text
   meta_keyword String?  @db.Text
   is_active    Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  tags ArticleTag[]
+  tags ArticleTag[] @relation("ArticleToArticleTags")
 }
 
 model Project {
-  id                  BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  id                  BigInt   @id @default(autoincrement()) @db.BigInt
   uuid                String   @unique
-  project_category_id BigInt   @db.UnsignedBigInt
+  project_category_id BigInt   @db.BigInt
   title               String   @unique
   image               String   @db.Text
   slug                String   @unique
-  description         String   @db.LongText
+  description         String   @db.Text
   stack               String   @db.Text
   link_github         String?  @db.Text
   link_project        String?  @db.Text
@@ -92,17 +92,17 @@ model Project {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  ProjectCategory ProjectCategory @relation(fields: [project_category_id], references: [id])
+  ProjectCategory     ProjectCategory @relation("CategoryToProjects", fields: [project_category_id], references: [id])
 }
 
 model ArticleTag {
-  article_id BigInt @db.UnsignedBigInt
-  tag_id     BigInt @db.UnsignedBigInt
+  article_id BigInt @db.BigInt
+  tag_id     BigInt @db.BigInt
 
   createdAt DateTime @default(now())
 
-  Article Article @relation(fields: [article_id], references: [id])
-  Tag     Tag     @relation(fields: [tag_id], references: [id])
+  Article Article @relation("ArticleToArticleTags", fields: [article_id], references: [id])
+  Tag     Tag     @relation("TagToArticleTags", fields: [tag_id], references: [id])
 
   @@id([article_id, tag_id])
 }
