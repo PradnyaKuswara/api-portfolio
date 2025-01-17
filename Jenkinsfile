@@ -49,10 +49,14 @@ pipeline {
             }
             steps {
                 script {
-                    sh """
-                        cd ${SERVER_PATH}
-                        sudo cp .env.production .env
-                    """
+                    sshagent(credentials: [SSH_CREDENTIALS]) {
+                        sh """
+                            ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "
+                                cd ${SERVER_PATH}
+                                cp .env.production .env
+                            "
+                        """
+                    }
                 }
             }
         }
