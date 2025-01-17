@@ -31,7 +31,7 @@ pipeline {
                                 source ~/.zshrc
                                 npm install
                                 npx prisma db push
-                                npm run build
+                                npm run build --update-env  
 
                                 # Stage: Handle PM2 🚀
                                 pm2 restart ${APP_INDEX}
