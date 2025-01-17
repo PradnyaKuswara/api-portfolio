@@ -29,12 +29,16 @@ pipeline {
             }
             steps {
                 script {
-                    sh """
-                        cd ${SERVER_PATH}
-                        git fetch --all
-                        git checkout ${env.BRANCH_NAME}
-                        git pull origin ${env.BRANCH_NAME}
-                    """
+                    sshagent(credentials: [SSH_CREDENTIALS]) {
+                        sh """
+                            ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "
+                                cd ${SERVER_PATH}
+                                git fetch --all
+                                git checkout ${env.BRANCH_NAME}
+                                git pull origin ${env.BRANCH_NAME}
+                            "
+                        """
+                    }
                 }
             }
         }
@@ -64,7 +68,7 @@ pipeline {
                     [ -s \$NVM_DIR/nvm.sh ] && \\. \$NVM_DIR/nvm.sh
                     cd /var/www/api-portfolio
                     npm install
-                     """
+                    """
                 }
             }
         }
