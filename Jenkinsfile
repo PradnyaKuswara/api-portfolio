@@ -87,16 +87,14 @@ pipeline {
             steps {
                 script {
                     sshagent(credentials: [SSH_CREDENTIALS]) {
-                        sh """
+                        sh '''
                             ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "
-                                export PM2_PATH=/home/kojidev/.nvm/versions/node/v20.18.1/bin/pm2
+                                source ~/.zshrc
                                 cd ${SERVER_PATH}
-
-                                # Restart the application with PM2 (or start if not running)
-                                \$PM2_PATH restart ${APP_NAME} || \$PM2_PATH start npm --name ${APP_NAME} -- run start
-                                \$PM2_PATH save
+                                pm2 restart 0
+                                pm2 save
                             "
-                        """
+                        '''
                     }
                 }
             }
