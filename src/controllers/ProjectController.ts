@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 import { validationResult } from "express-validator";
 import { v4 as uuidv4 } from 'uuid';
 import fs from "fs";
-import path from "path";
 import { bodyType, Project } from "../@types/Project";
 
 const prisma = new PrismaClient();
@@ -125,23 +124,9 @@ class ProjectController {
 
   async store(req: Request, res: Response, next: NextFunction): Promise<void> {
     let errors: any = validationResult(req);
-    let imageSaved: string = "";
-    let additionalErrors: any[] = [];
 
-    if (!req.file) {
-      additionalErrors.push({
-        type: "field",
-        msg: "Image is required",
-        path: "image",
-        location: "body",
-        value: undefined
-      });
-    } else {
-      imageSaved = path.relative("public", req.file.path);
-    }
-
-    if (!errors.isEmpty() || additionalErrors.length > 0) {
-      const allErrors: any[] = [...errors.array(), ...additionalErrors];
+    if (!errors.isEmpty()) {
+      const allErrors: any[] = [...errors.array()];
       res.status(400).json({
         message: "Validation error",
         status: 400,
@@ -161,7 +146,7 @@ class ProjectController {
           uuid: generateUUID(),
           project_category_id: body.project_category_id,
           title: body.title,
-          image: imageSaved,
+          image: body.image,
           slug: generateSlug(body.title),
           description: body.description,
           stack: body.stack,
@@ -196,7 +181,6 @@ class ProjectController {
 
   async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     const errors: any = validationResult(req);
-    let imageUpdated: string = "";
 
     if (!errors.isEmpty()) {
       res.status(400).json({
@@ -204,9 +188,6 @@ class ProjectController {
         status: 400,
         errors: errors.array()
       });
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
       return;
     }
 
@@ -228,13 +209,6 @@ class ProjectController {
       return;
     }
 
-    if (req.file && project) {
-      fs.unlinkSync(`public/${project.image}`);
-      imageUpdated = path.relative("public", req.file.path);
-    } else {
-      imageUpdated = project?.image || "";
-    }
-
     const slugParam: string = req.params.slug;
     const body: bodyType = req.body;
 
@@ -246,7 +220,7 @@ class ProjectController {
         data: {
           project_category_id: body.project_category_id,
           title: body.title,
-          image: imageUpdated,
+          image: body.image,
           slug: project && project.title !== body.title ? generateSlug(body.title) : project?.slug,
           description: body.description,
           stack: body.stack,
@@ -301,8 +275,6 @@ class ProjectController {
         });
         return;
       }
-
-      fs.unlinkSync(`public/${project.image}`);
 
       await prisma.project.delete({
         where: {

@@ -20,6 +20,8 @@ export const StoreProjectRequest = [
   body("meta_desc").isLength({ min: 2 }).withMessage("Meta description must  be at least 2 characters long"),
   body("meta_keyword").isString().withMessage("Meta keyword must be a string"),
   body("meta_keyword").isLength({ min: 2 }).withMessage("Meta keyword must  be at least 2 characters long"),
+  body("image").not().isEmpty().withMessage("Image is required"),
+  body("image").isString().withMessage("Image must be a string"),
   body("title").custom(async (value) => {
     const project = await prisma.project.findFirst({
       where: {
