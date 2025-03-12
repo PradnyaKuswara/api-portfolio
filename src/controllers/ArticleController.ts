@@ -3,8 +3,7 @@ import { bodyType, Article, ArticleTag, Tag } from "../@types/Article";
 import { PrismaClient } from "@prisma/client";
 import { validationResult } from "express-validator";
 import { v4 as uuidv4 } from 'uuid';
-import fs from "fs";
-import path from "path";
+
 
 const prisma = new PrismaClient();
 
@@ -135,32 +134,14 @@ class ArticleController {
 
   async store(req: Request, res: Response, next: NextFunction): Promise<void> {
     const errors: any = validationResult(req);
-    let imageSaved: string = "";
 
-    let additionalErrors: any[] = [];
-
-    if (!req.file) {
-      additionalErrors.push({
-        type: "field",
-        msg: "Image is required",
-        path: "image",
-        location: "body",
-        value: undefined
-      });
-    } else {
-      imageSaved = path.relative("public", req.file.path);
-    }
-
-    if (!errors.isEmpty() || additionalErrors.length > 0) {
-      const allErrors: any[] = [...errors.array(), ...additionalErrors];
+    if (!errors.isEmpty()) {
+      const allErrors: any[] = [...errors.array()];
       res.status(400).json({
         message: "Validation failed",
         status: 400,
         errors: allErrors
       });
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
       return;
     }
 
@@ -171,7 +152,7 @@ class ArticleController {
         data: {
           uuid: generateUUID(),
           title: body.title,
-          thumbnail: imageSaved,
+          thumbnail: body.thumbnail,
           slug: generateSlug(body.title),
           content: body.content,
           meta_desc: body.meta_desc,
@@ -248,7 +229,6 @@ class ArticleController {
 
   async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     const errors: any = validationResult(req);
-    let imageUpdated: string = "";
 
     if (!errors.isEmpty()) {
       res.status(400).json({
@@ -256,9 +236,6 @@ class ArticleController {
         status: 400,
         errors: errors.array()
       });
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
       return;
     }
 
@@ -284,13 +261,6 @@ class ArticleController {
       return;
     }
 
-    if (req.file && article) {
-      fs.unlinkSync(`public/${article.thumbnail}`);
-      imageUpdated = path.relative("public", req.file.path);
-    } else {
-      imageUpdated = article.thumbnail;
-    }
-
     const slugParam: string = req.params.slug;
     const body: bodyType = req.body;
 
@@ -301,7 +271,7 @@ class ArticleController {
         },
         data: {
           title: body.title,
-          thumbnail: imageUpdated,
+          thumbnail: body.thumbnail,
           content: body.content,
           slug: article && article.title !== body.title ? generateSlug(body.title) : article.slug,
           meta_desc: body.meta_desc,
@@ -407,8 +377,6 @@ class ArticleController {
         });
         return;
       }
-
-      fs.unlinkSync(`public/${article.thumbnail}`);
 
       await prisma.articleTag.deleteMany({
         where: {

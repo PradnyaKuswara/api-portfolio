@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import { validationResult } from "express-validator";
 import { v4 as uuidv4 } from 'uuid';
-import fs from "fs";
 import { bodyType, Project } from "../@types/Project";
 
 const prisma = new PrismaClient();
@@ -132,9 +131,6 @@ class ProjectController {
         status: 400,
         errors: allErrors
       });
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
       return;
     }
 

@@ -2,7 +2,7 @@ declare namespace ArticleNamespace {
   type bodyType = {
     uuid: string,
     title: string;
-    thumbail: string;
+    thumbnail: string;
     slug: string;
     content: string;
     meta_desc: string;

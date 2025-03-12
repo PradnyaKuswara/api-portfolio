@@ -17,6 +17,8 @@ export const StoreArticleRequest = [
   body("meta_desc").isLength({ min: 2 }).withMessage("Meta description must  be at least 2 characters long"),
   body("meta_keyword").isString().withMessage("Meta keyword must be a string"),
   body("meta_keyword").isLength({ min: 2 }).withMessage("Meta keyword must  be at least 2 characters long"),
+  body("thumbnail").not().isEmpty().withMessage("Thumbnail is required"),
+  body("thumbnail").isString().withMessage("Thumbnail must be a string"),
   body("title").custom(async (value) => {
     const article = await prisma.article.findFirst({
       where: {
