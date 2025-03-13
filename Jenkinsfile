@@ -13,32 +13,31 @@ pipeline {
             steps {
                 script {
                     sh """
-                        # Stage: Prepare SSH Key 🔑"
+                        sudo -u kojidev -i'
+                        # Stage: Load Environment & Navigate
+                        source ~/.zshrc
                         cd ${SERVER_PATH}
 
                         # Stage: Prepare Branch Name 🌿
-                        BRANCH_NAME=\$(echo ${GIT_BRANCH} | sed 's|.*/||')
-                        echo 'Branch name: \$BRANCH_NAME'
+                        BRANCH_NAME=\$(echo ${GIT_BRANCH} | sed "s|.*/||")
+                        echo "Branch name: \$BRANCH_NAME"
                         git fetch --all
                         git checkout \$BRANCH_NAME
                         git pull origin \$BRANCH_NAME
 
-                        # Stage: Copy environment file production 📝
+                        # Stage: Setup Environment & Dependencies
                         cp .env.production .env
-
-                        # Stage: Install Dependencies & Migrate 📦
-                        source ~/.zshrc
                         npm install
                         npx prisma db push
                         npm run build --update-env
 
-                        # Stage: Handle PM2 🚀
+                        # Stage: Restart PM2
                         pm2 restart ${APP_INDEX}
                         pm2 save
 
-                        echo 'Deployment Complete 🚀'
-                    "
-                """
+                        echo "Deployment Complete 🚀"
+                        '
+                    """
                 }
             }
         }
