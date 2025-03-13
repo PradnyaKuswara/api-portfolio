@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent kojidev - agent
     environment {
         SSH_HOST = "${env.SSH_HOST_KOJIDEV}"
         SSH_USER = "${env.SSH_USER_KOJIDEV}"
@@ -12,35 +12,33 @@ pipeline {
         stage('Prepare and Execute All Stages 🚀') {
             steps {
                 script {
-                    sshagent(credentials: [SSH_CREDENTIALS]) {
-                        sh """
-                            ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "
-                                cd ${SERVER_PATH}
+                    sh """
+                        # Stage: Prepare SSH Key 🔑"
+                        cd ${SERVER_PATH}
 
-                                # Stage: Prepare Branch Name 🌿
-                                BRANCH_NAME=\$(echo ${GIT_BRANCH} | sed 's|.*/||')
-                                echo 'Branch name: \$BRANCH_NAME'
-                                git fetch --all
-                                git checkout \$BRANCH_NAME
-                                git pull origin \$BRANCH_NAME
+                        # Stage: Prepare Branch Name 🌿
+                        BRANCH_NAME=\$(echo ${GIT_BRANCH} | sed 's|.*/||')
+                        echo 'Branch name: \$BRANCH_NAME'
+                        git fetch --all
+                        git checkout \$BRANCH_NAME
+                        git pull origin \$BRANCH_NAME
 
-                                # Stage: Copy environment file production 📝
-                                cp .env.production .env
+                        # Stage: Copy environment file production 📝
+                        cp .env.production .env
 
-                                # Stage: Install Dependencies & Migrate 📦
-                                source ~/.zshrc
-                                npm install
-                                npx prisma db push
-                                npm run build --update-env  
+                        # Stage: Install Dependencies & Migrate 📦
+                        source ~/.zshrc
+                        npm install
+                        npx prisma db push
+                        npm run build --update-env
 
-                                # Stage: Handle PM2 🚀
-                                pm2 restart ${APP_INDEX}
-                                pm2 save
+                        # Stage: Handle PM2 🚀
+                        pm2 restart ${APP_INDEX}
+                        pm2 save
 
-                                echo 'Deployment Complete 🚀'
-                            "
-                        """
-                    }
+                        echo 'Deployment Complete 🚀'
+                    "
+                """
                 }
             }
         }
