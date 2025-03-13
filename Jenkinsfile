@@ -27,11 +27,17 @@ pipeline {
                 script {
                     sh """
                         sudo -u kojidev -i zsh << 'EOF'
+                        sudo chown -R kojidev:kojidev '${SERVER_PATH}/.git'
+
                         cd '${SERVER_PATH}' || exit 1
                         pwd
 
                         BRANCH_NAME=\$(echo '${GIT_BRANCH}' | sed "s|.*/||")
                         echo "🔀 Branch: \$BRANCH_NAME"
+
+                        # Bersihkan cache dan kunci Git
+                        git gc --prune=now
+                        rm -f .git/index.lock
 
                         echo "🔄 Fetching origin"
                         git fetch --all
