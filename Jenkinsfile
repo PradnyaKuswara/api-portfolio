@@ -1,6 +1,6 @@
 pipeline {
     agent { label 'built-in-node' }
-    
+
     environment {
         SSH_HOST = "${env.SSH_HOST_KOJIDEV}"
         SSH_USER = "${env.SSH_USER_KOJIDEV}"
@@ -11,52 +11,107 @@ pipeline {
     }
 
     stages {
-        stage('Prepare and Execute All Stages 🚀') {
+        stage('Check Environment & User') {
             steps {
                 script {
                     sh """
-                        echo "🟢 Menjalankan sebagai user:"
-
                         sudo -u kojidev -i zsh << 'EOF'
-                        echo "User saat ini: \$(whoami)"
-                        
-                        # Load environment
-                        source ~/.zshrc
+                        echo "🟢 Menjalankan sebagai user: \$(whoami)"
+                    """
+                }
+            }
+        }
 
-                        echo "📁 Berpindah ke direktori: ${SERVER_PATH}"
+        stage('Prepare Repository') {
+            steps {
+                script {
+                    sh """
+                        sudo -u kojidev -i zsh << 'EOF'
                         cd '${SERVER_PATH}' || exit 1
                         pwd
 
                         BRANCH_NAME=\$(echo '${GIT_BRANCH}' | sed "s|.*/||")
-                        echo "🔀 Branch name: \$BRANCH_NAME"
+                        echo "🔀 Branch: \$BRANCH_NAME"
 
                         echo "🔄 Fetching origin"
                         git fetch --all
                         git checkout "\$BRANCH_NAME"
                         git pull origin "\$BRANCH_NAME"
+                    """
+                }
+            }
+        }
 
+        stage('Check Node & Package Manager') {
+            steps {
+                script {
+                    sh """
+                        sudo -u kojidev -i zsh << 'EOF'
+                        source ~/.zshrc
                         echo "🛠️ Node: \$(which node)"
                         echo "🛠️ npm: \$(which npm)"
                         echo "🛠️ npx: \$(which npx)"
                         echo "🛠️ pm2: \$(which pm2)"
+                    """
+                }
+            }
+        }
 
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sh """
+                        sudo -u kojidev -i zsh << 'EOF'
+                        source ~/.zshrc
+                        cd '${SERVER_PATH}' || exit 1
                         echo "📦 Menyalin environment"
                         cp .env.production .env
 
                         echo "📦 Menginstall dependency"
                         npm install
+                    """
+                }
+            }
+        }
 
+        stage('Run Prisma Migration') {
+            steps {
+                script {
+                    sh """
+                        sudo -u kojidev -i zsh << 'EOF'
+                        source ~/.zshrc
+                        cd '${SERVER_PATH}' || exit 1
                         echo "📊 Menjalankan migrasi Prisma"
                         npx prisma db push
+                    """
+                }
+            }
+        }
 
+        stage('Build Application') {
+            steps {
+                script {
+                    sh """
+                        sudo -u kojidev -i zsh << 'EOF'
+                        source ~/.zshrc
+                        cd '${SERVER_PATH}' || exit 1
                         echo "🛠️ Membuat build aplikasi"
                         npm run build --update-env
+                    """
+                }
+            }
+        }
 
+        stage('Restart PM2') {
+            steps {
+                script {
+                    sh """
+                        sudo -u kojidev -i zsh << 'EOF'
+                        source ~/.zshrc
+                        cd '${SERVER_PATH}' || exit 1
                         echo "🚀 Restarting PM2"
                         pm2 restart '${APP_INDEX}'
                         pm2 save
-
-                        echo "✅ Deployment Complete 🚀"
                     """
                 }
             }
@@ -71,7 +126,7 @@ pipeline {
             echo '❌ Deployment Gagal!'
         }
         always {
-            echo 'Pipeline selesai.'
+            echo '✅ Pipeline selesai.'
         }
     }
 }
