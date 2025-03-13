@@ -1,5 +1,5 @@
 pipeline {
-    agent kojidev - agent
+    agent { label 'kojidev-agent' }
     environment {
         SSH_HOST = "${env.SSH_HOST_KOJIDEV}"
         SSH_USER = "${env.SSH_USER_KOJIDEV}"
