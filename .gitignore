@@ -7,3 +7,5 @@ rest
 public
 package-lock.json
 dist
+Dockerfile
+docker-compose.yml
